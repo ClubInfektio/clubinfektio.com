@@ -36,7 +36,7 @@
             border-radius: 10px;
             backdrop-filter: blur(15px) brightness(50%);
         }
-        @media (min-height: 560px) {
+        @media (min-height: 580px) {
             main {
                 display: flex;
                 justify-content: center;
@@ -46,8 +46,9 @@
                 margin: 8px;
             }
         }
-        h1 {
-            text-align: center;
+        #logo img{
+            max-width: 100%;
+            margin: auto;
         }
         .text-center {
             text-align: center;
@@ -70,11 +71,15 @@
         <picture id="background">
             <source srcset="assets/images/bg.webp" type="image/webp">
             <source srcset="assets/images/bg.jpg" type="image/jpeg"> 
-            <img src="assets/images/bg.jpg" alt="Alt Text!">
+            <img src="assets/images/bg.jpg" alt="People dancing to electronic music">
         </picture>
         <main>
             <section id="content">
-                <h1>Club INFEKTIO</h1>
+                <picture id="logo">
+                    <source srcset="assets/images/logo.webp" type="image/webp">
+                    <source srcset="assets/images/logo.png" type="image/png"> 
+                    <img src="assets/images/logo.png" alt="Club INFEKTIO">
+                </picture>
                 <p>
                     Club Infektio on helsinkiläinen synkkään konemusiikkiin keskittyvä klubi joka tarjoilee tanssilattian täydeltä industrialia, EBM:ia, futurepoppia ja dark electroa sekä kaikkea mahdollista ja mahdotonta niiden ympäriltä. Alan kovimpien kotimaisten DJ:en ohella lavallemme nousee säännöllisesti sekä uusia että harvoin esiintyviä artisteja edellä mainituista genreistä. Party like it's 2085!
                 </p>
