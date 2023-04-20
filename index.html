@@ -11,22 +11,10 @@
             height: 100%;
             color: white;
             font-family:Arial, Helvetica, sans-serif;
-            background: #22005a;
         }
-        #background {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-        }
-        #background img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        main {
-            position: absolute;
-            inset: 0;
+        body {
+            background: #22005a url(assets/images/bg.webp) no-repeat 50% 50% / cover;
+            padding: 10px;
         }
         #content {
             width: 100%;
@@ -37,13 +25,10 @@
             backdrop-filter: blur(15px) brightness(50%);
         }
         @media (min-height: 580px) {
-            main {
+            body {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-            }
-            #content {
-                margin: 8px;
             }
         }
         #logo img{
@@ -68,11 +53,6 @@
     </style>
     </head>
     <body>
-        <picture id="background">
-            <source srcset="assets/images/bg.webp" type="image/webp">
-            <source srcset="assets/images/bg.jpg" type="image/jpeg"> 
-            <img src="assets/images/bg.jpg" alt="People dancing to electronic music">
-        </picture>
         <main>
             <section id="content">
                 <picture id="logo">
@@ -90,7 +70,18 @@
                     <br/>
                     <a class="button" href="https://infektio.wordpress.com/" ref="noreferrer">Old posts and pictures</a>
                 </p>
+                <p id="first-post">
+                    
+                </p>
                 <!-- TODO: fetch https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts/ instead -->
+
+                <script>
+                    fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts')
+                        .then(response => response.json())
+                        .then(response => {
+                            document.querySelector('#first-post').innerHTML = response?.posts?.[0]?.content ?? ''
+                        })
+                </script>
             </section>
         </main>
     </body>
