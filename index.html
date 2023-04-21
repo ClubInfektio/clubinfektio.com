@@ -14,26 +14,47 @@
         }
         body {
             background: #22005a url(assets/images/bg.webp) no-repeat 50% 50% / cover;
+            background-attachment: fixed;
             padding: 10px;
+        }
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        p {
+            line-height: 1.3;
+        }
+        a {
+            color: white;
+            font-weight: bold;
         }
         #content {
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
-            padding: 20px;
-            border-radius: 10px;
+        }
+        #content img {
+            max-width: 100%;
+            height: auto;
+        }
+        .card, .dark-bg {
             backdrop-filter: blur(15px) brightness(50%);
         }
-        @media (min-height: 580px) {
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
+        .card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 10px;
+            max-height: 9999px;
+            overflow: hidden;
+            transition: 0.5s opacity, 2s max-height;
         }
-        #logo img{
-            max-width: 100%;
-            margin: auto;
+        .card p:first-child { margin-top: 0; }
+        .card p:last-child { margin-bottom: 0; }
+        .closed {
+            opacity: 0;
+            max-height: 0px;
         }
         .text-center {
             text-align: center;
@@ -50,39 +71,97 @@
             font-weight: bold;
             text-decoration: none;
         }
+        @media (min-width: 400px) {
+            .button {
+                margin: 10px;
+            }
+        }
+        .deleted {
+            display: none;
+        }
     </style>
     </head>
     <body>
         <main>
             <section id="content">
-                <picture id="logo">
-                    <source srcset="assets/images/logo.webp" type="image/webp">
-                    <source srcset="assets/images/logo.png" type="image/png"> 
-                    <img src="assets/images/logo.png" alt="Club INFEKTIO">
-                </picture>
-                <p>
-                    Club Infektio on helsinkiläinen synkkään konemusiikkiin keskittyvä klubi joka tarjoilee tanssilattian täydeltä industrialia, EBM:ia, futurepoppia ja dark electroa sekä kaikkea mahdollista ja mahdotonta niiden ympäriltä. Alan kovimpien kotimaisten DJ:en ohella lavallemme nousee säännöllisesti sekä uusia että harvoin esiintyviä artisteja edellä mainituista genreistä. Party like it's 2085!
-                </p>
-                <p class="text-center">
-                    <a class="button" href="https://www.instagram.com/clubinfektio/" ref="noreferrer">Instagram</a>
-                    <br/>
-                    <a class="button" href="https://www.facebook.com/infektio" ref="noreferrer">Facebook</a>
-                    <br/>
-                    <a class="button" href="https://infektio.wordpress.com/" ref="noreferrer">Old posts and pictures</a>
-                </p>
-                <p id="first-post">
-                    
-                </p>
-                <!-- TODO: fetch https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts/ instead -->
+                <div class="card">
+                    <picture id="logo">
+                        <source srcset="assets/images/logo.webp" type="image/webp">
+                        <source srcset="assets/images/logo.png" type="image/png"> 
+                        <img src="assets/images/logo.png" alt="Club INFEKTIO">
+                    </picture>
+                    <p>
+                        Club Infektio on helsinkiläinen synkkään konemusiikkiin keskittyvä klubi joka tarjoilee tanssilattian täydeltä industrialia, EBM:ia, futurepoppia ja dark electroa sekä kaikkea mahdollista ja mahdotonta niiden ympäriltä. Alan kovimpien kotimaisten DJ:en ohella lavallemme nousee säännöllisesti sekä uusia että harvoin esiintyviä artisteja edellä mainituista genreistä. Party like it's 2085!
+                    </p>
+                    <p class="text-center">
+                        <a class="button" href="https://www.instagram.com/clubinfektio/" ref="noreferrer">Instagram</a>
+                        <a class="button" href="https://www.facebook.com/infektio" ref="noreferrer">Facebook</a>
+                    </p>
+                </div>
 
-                <script>
-                    fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts')
-                        .then(response => response.json())
-                        .then(response => {
-                            document.querySelector('#first-post').innerHTML = response?.posts?.[0]?.content ?? ''
-                        })
-                </script>
+                <div id="wp-posts"></div>
+
+                <p class="text-center">
+                    <a class="button dark-bg" href="#old" id="old-posts-button">Selaa vanhoja artikkeleita ja kuvia</a>
+                </p>
+
             </section>
         </main>
+
+        <script>
+            function domLoaded() {
+                let oldPosts = [];
+                let page = 0;
+                const pageSize = 20;
+                fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?number=1')
+                    .then(response => response.json())
+                    .then(response => renderPost({ ...response?.posts?.[0], title: null }));
+
+                document.querySelector('#old-posts-button').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (page > 0) {
+                        renderNextPage();
+                        return;
+                    }
+
+                    Promise.all([fetch('assets/old-posts-0.json'), fetch('assets/old-posts-1.json')])
+                        .then(responses => Promise.all(responses.map(response => response.json())))
+                        .then(responses => responses.flatMap(response => response?.posts ?? []))
+                        .then(posts => {
+                            oldPosts = posts.map(post => ({
+                                ...post,
+                                content: post.content
+                                    .replace(/<div[^<>]*style="float:left;width:100%;height:\d*px;overflow:hidden;"[^<>]*>/ig, '<div class="deleted">')
+                                    .replace(/style="[^"]*"/ig, '')
+                            }));
+                            renderNextPage();
+                            document.querySelector('#old-posts-button').textContent = 'Näytä lisää';
+                        });
+                });
+
+                function renderPost(post) {
+                    if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
+                        return;
+                    }
+                    const postElement = document.createElement('div');
+                    const titleElement = post.title ? `<h2>${post.title}</h2>` : '';
+                    postElement.innerHTML = `${titleElement}${post.content}`;
+                    postElement.className = 'card closed';
+                    document.querySelector('#wp-posts').appendChild(postElement);
+                    setTimeout(() => {
+                        postElement.classList.remove('closed');
+                        postElement.querySelectorAll('.deleted').forEach(element => element.remove());
+                    }, 1);
+                }
+
+                function renderNextPage() {
+                    const offset = page * pageSize;
+                    oldPosts.slice(offset, offset + pageSize).forEach(post => renderPost(post));
+                    page++;
+                }
+            }
+
+            addEventListener('DOMContentLoaded', domLoaded);
+        </script>
     </body>
 </html>
