@@ -30,6 +30,9 @@
             color: white;
             font-weight: bold;
         }
+        h2 {
+            margin-bottom: 0;
+        }
         #content {
             width: 100%;
             max-width: 700px;
@@ -37,7 +40,16 @@
         }
         #content img {
             max-width: 100%;
+            max-height: 660px;
+            object-fit: contain;
             height: auto;
+            margin: auto;
+            display: block;
+        }
+        .date {
+            color: #aaa;
+            margin-top: 3px;
+            font-size: 14px;
         }
         .card, .dark-bg {
             backdrop-filter: blur(15px) brightness(50%);
@@ -50,7 +62,7 @@
             overflow: hidden;
             transition: 0.5s opacity, 2s max-height;
         }
-        .card p:first-child { margin-top: 0; }
+        .card p:first-child, .card h2:first-child { margin-top: 0; }
         .card p:last-child { margin-bottom: 0; }
         .closed {
             opacity: 0;
@@ -133,6 +145,9 @@
                                 content: post.content
                                     .replace(/<div[^<>]*style="float:left;width:100%;height:\d*px;overflow:hidden;"[^<>]*>/ig, '<div class="deleted">')
                                     .replace(/style="[^"]*"/ig, '')
+                                    .replace(/href=["']https?:\/\/clubinfektio\.com[^"']*["']/ig, '')
+                                    .replace(/href=["']https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*["']/ig, '')
+                                    .replace(/href=["']https?:\/\/infektio\.wordpress\.com[^"']*["']/ig, '')
                             }));
                             renderNextPage();
                             document.querySelector('#old-posts-button').textContent = 'Näytä lisää';
@@ -144,7 +159,8 @@
                         return;
                     }
                     const postElement = document.createElement('div');
-                    const titleElement = post.title ? `<h2>${post.title}</h2>` : '';
+                    const date = new Date(post.date)
+                    const titleElement = post.title ? `<h2>${post.title}</h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
                     postElement.innerHTML = `${titleElement}${post.content}`;
                     postElement.className = 'card closed';
                     document.querySelector('#wp-posts').appendChild(postElement);
