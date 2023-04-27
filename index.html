@@ -46,6 +46,18 @@
             margin: auto;
             display: block;
         }
+        .wp-posts {
+            overflow: hidden;
+        }
+        .wp-posts img[src$=".jpg"], .wp-posts img[src$=".jpeg"]{
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23fff' viewBox='0 0 16 16'%3E%3Cpath d='M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z'/%3E%3Cpath d='M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z'/%3E%3C/svg%3E") no-repeat 50% 30%;
+        }
+        #year-selector {
+            display: none;
+        }
+        #old-posts-button {
+            margin-bottom: 30px;
+        }
         .date {
             color: #aaa;
             margin-top: 3px;
@@ -58,15 +70,50 @@
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 10px;
-            max-height: 9999px;
-            overflow: hidden;
-            transition: 0.5s opacity, 2s max-height;
+            transition: 0.5s opacity;
         }
         .card p:first-child, .card h2:first-child { margin-top: 0; }
         .card p:last-child { margin-bottom: 0; }
+        .post {
+            transition: 3s max-height;
+            max-height: 9999px;
+            display: flow-root;
+        }
+        .preview .post {
+            transition: 0.3s max-height;
+        }
         .closed {
             opacity: 0;
+        }
+        .closed .post {
             max-height: 0px;
+        }
+        .preview {
+            cursor: pointer;
+            position: relative;
+        }
+        .preview::after {
+            content: 'Lue lisää';
+            position: absolute;
+            left: 0;
+            bottom: 15px;
+            padding-bottom: 15px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") no-repeat 50% 100%;
+            transition: 0.15s transform;
+        }
+        @media (hover: hover) {
+            .preview:hover .post {
+                max-height: 520px;
+            }
+        }
+        .preview .post {
+            max-height: 500px;
+            -webkit-mask-image: -webkit-linear-gradient(270deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 95%);
+            mask-image: linear-gradient(270deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 95%);
         }
         .text-center {
             text-align: center;
@@ -82,6 +129,22 @@
             color: white;
             font-weight: bold;
             text-decoration: none;
+            text-align: center;
+        }
+        .button[disabled] {
+            opacity: 0.4;
+            cursor: default;
+        }
+        .button.small {
+            width: auto;
+            min-width: 70px;
+            margin: 10px 3px 10px 0;
+            font-size: 14px
+        }
+        .button.selected {
+            background: white;
+            color: black;
+            backdrop-filter: none;
         }
         @media (min-width: 400px) {
             .button {
@@ -111,7 +174,21 @@
                     </p>
                 </div>
 
-                <div id="wp-posts"></div>
+                <div id="first-post" class="wp-posts"></div>
+
+                <div id="year-selector">
+                    <a class="button small dark-bg selected" href="#">2019</a>
+                    <a class="button small dark-bg" href="#">2018</a>
+                    <a class="button small dark-bg" href="#">2017</a>
+                    <a class="button small dark-bg" href="#">2016</a>
+                    <a class="button small dark-bg" href="#">2015</a>
+                    <a class="button small dark-bg" href="#">2014</a>
+                    <a class="button small dark-bg" href="#">2013</a>
+                    <a class="button small dark-bg" href="#">2012</a>
+                    <a class="button small dark-bg" href="#">2011</a>
+                </div>
+
+                <div id="wp-posts" class="wp-posts"></div>
 
                 <p class="text-center">
                     <a class="button dark-bg" href="#old" id="old-posts-button">Selaa vanhoja artikkeleita ja kuvia</a>
@@ -123,7 +200,7 @@
         <script>
             function domLoaded() {
                 let oldPosts = [];
-                let page = 0;
+                let offset = 0;
                 const pageSize = 20;
                 fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?number=1')
                     .then(response => response.json())
@@ -131,11 +208,18 @@
 
                 document.querySelector('#old-posts-button').addEventListener('click', (event) => {
                     event.preventDefault();
-                    if (page > 0) {
+                    if (oldPosts.length > 0) {
                         renderNextPage();
                         return;
                     }
 
+                    const loadMoreButton = document.querySelector('#old-posts-button');
+                    if (loadMoreButton.getAttribute('disabled')) {
+                        return;
+                    }
+
+                    loadMoreButton.setAttribute('disabled', true);
+                    loadMoreButton.textContent = 'Ladataan ...';
                     Promise.all([fetch('assets/old-posts-0.json'), fetch('assets/old-posts-1.json')])
                         .then(responses => Promise.all(responses.map(response => response.json())))
                         .then(responses => responses.flatMap(response => response?.posts ?? []))
@@ -150,30 +234,66 @@
                                     .replace(/href=["']https?:\/\/infektio\.wordpress\.com[^"']*["']/ig, '')
                             }));
                             renderNextPage();
-                            document.querySelector('#old-posts-button').textContent = 'Näytä lisää';
+                            document.querySelector('#year-selector').style.display = 'block';
+                            loadMoreButton.textContent = 'Näytä lisää';
+                            loadMoreButton.removeAttribute('disabled');
                         });
                 });
 
-                function renderPost(post) {
+                document.querySelector('#year-selector').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!event.target.text) {
+                        return;
+                    }
+
+                    document.querySelector('#year-selector .selected').classList.remove('selected');
+                    event.target.classList.add('selected');
+                    document.querySelector('#wp-posts').replaceChildren();
+
+                    const year = parseInt(event.target.text);
+                    if (year) {
+                        offset = oldPosts.findIndex(post => (new Date(post.date)).getFullYear() === year);
+                        renderNextPage();
+                    }
+                });
+
+                function renderPost(post, oldPost = false) {
                     if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
                         return;
                     }
+                    const cardElement = document.createElement('div');
                     const postElement = document.createElement('div');
                     const date = new Date(post.date)
                     const titleElement = post.title ? `<h2>${post.title}</h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
                     postElement.innerHTML = `${titleElement}${post.content}`;
-                    postElement.className = 'card closed';
-                    document.querySelector('#wp-posts').appendChild(postElement);
+                    postElement.className = 'post';
+                    cardElement.className = 'card closed';
+                    cardElement.addEventListener('click', () => openCard(cardElement))
+                    document.querySelector(oldPost ? '#wp-posts' : '#first-post')
+                        .appendChild(cardElement)
+                        .appendChild(postElement);
+                    if (!oldPost) {
+                        openCard(cardElement);
+                    }
+
                     setTimeout(() => {
-                        postElement.classList.remove('closed');
                         postElement.querySelectorAll('.deleted').forEach(element => element.remove());
+                        if (oldPost) {
+                            cardElement.classList.replace('closed', 'preview');
+                        }
+                    }, 1);
+                }
+
+                function openCard(cardElement) {
+                    setTimeout(() => {
+                        cardElement.classList.replace('closed', 'open');
+                        cardElement.classList.replace('preview', 'open');
                     }, 1);
                 }
 
                 function renderNextPage() {
-                    const offset = page * pageSize;
-                    oldPosts.slice(offset, offset + pageSize).forEach(post => renderPost(post));
-                    page++;
+                    oldPosts.slice(offset, offset + pageSize).forEach(post => renderPost(post, true));
+                    offset += pageSize;
                 }
             }
 
