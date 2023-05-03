@@ -208,15 +208,15 @@
                 <div id="first-post" class="wp-posts"></div>
 
                 <div id="year-selector">
-                    <a class="button small dark-bg selected" href="#">2019</a>
-                    <a class="button small dark-bg" href="#">2018</a>
-                    <a class="button small dark-bg" href="#">2017</a>
-                    <a class="button small dark-bg" href="#">2016</a>
-                    <a class="button small dark-bg" href="#">2015</a>
-                    <a class="button small dark-bg" href="#">2014</a>
-                    <a class="button small dark-bg" href="#">2013</a>
-                    <a class="button small dark-bg" href="#">2012</a>
-                    <a class="button small dark-bg" href="#">2011</a>
+                    <a class="button small dark-bg selected" href="#2019">2019</a>
+                    <a class="button small dark-bg" href="#2018">2018</a>
+                    <a class="button small dark-bg" href="#2017">2017</a>
+                    <a class="button small dark-bg" href="#2016">2016</a>
+                    <a class="button small dark-bg" href="#2015">2015</a>
+                    <a class="button small dark-bg" href="#2014">2014</a>
+                    <a class="button small dark-bg" href="#2013">2013</a>
+                    <a class="button small dark-bg" href="#2012">2012</a>
+                    <a class="button small dark-bg" href="#2011">2011</a>
                 </div>
 
                 <div id="wp-posts" class="wp-posts"></div>
@@ -238,10 +238,17 @@
                 let offset = 0;
                 const pageSize = 20;
                 const modal = document.querySelector('#modal');
+                const loadMoreButton = document.querySelector('#old-posts-button');
 
                 fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?number=1')
                     .then(response => response.json())
                     .then(response => renderPost({ ...response?.posts?.[0], title: null }));
+
+                const yearCandidate = parseInt(window.location.hash.replace('#', ''))
+                const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null
+                if (initialYear) {
+                    loadOldPosts();
+                }
 
                 document.querySelector('#old-posts-button').addEventListener('click', event => {
                     event.preventDefault();
@@ -250,53 +257,56 @@
                         return;
                     }
 
-                    const loadMoreButton = document.querySelector('#old-posts-button');
                     if (loadMoreButton.getAttribute('disabled')) {
                         return;
                     }
 
-                    loadMoreButton.setAttribute('disabled', true);
-                    loadMoreButton.textContent = 'Ladataan ...';
-                    Promise.all([fetch('assets/old-posts-0.json'), fetch('assets/old-posts-1.json')])
-                        .then(responses => Promise.all(responses.map(response => response.json())))
-                        .then(responses => responses.flatMap(response => response?.posts ?? []))
-                        .then(posts => {
-                            oldPosts = posts.map(post => ({
-                                ...post,
-                                content: post.content
-                                    .replace(/<div[^<>]*style="float:left;width:100%;height:\d*px;overflow:hidden;"[^<>]*>/ig, '<div class="deleted">')
-                                    .replace(/style="[^"]*"/ig, '')
-                                    .replace(/href=["']https?:\/\/clubinfektio\.com[^"']*["']/ig, '')
-                                    .replace(/href=["']https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*["']/ig, '')
-                                    .replace(/href=["']https?:\/\/infektio\.wordpress\.com[^"']*["']/ig, '')
-                            }));
-                            renderNextPage();
-                            document.querySelector('#year-selector').style.display = 'block';
-                            loadMoreButton.textContent = 'Näytä lisää';
-                            loadMoreButton.removeAttribute('disabled');
-                        });
+                    loadOldPosts();
                 });
 
                 document.querySelector('#year-selector').addEventListener('click', event => {
-                    event.preventDefault();
                     if (!event.target.text) {
                         return;
                     }
 
-                    document.querySelector('#year-selector .selected').classList.remove('selected');
-                    event.target.classList.add('selected');
-                    document.querySelector('#wp-posts').replaceChildren();
-
-                    const year = parseInt(event.target.text);
-                    if (year) {
-                        offset = oldPosts.findIndex(post => (new Date(post.date)).getFullYear() === year);
-                        renderNextPage();
-                    }
+                    selectYear(parseInt(event.target.text));
                 });
 
                 modal.addEventListener('click', () => {
                     modal.classList.add('closed')
                 })
+
+                function loadOldPosts() {
+                    loadMoreButton.setAttribute('disabled', true);
+                    loadMoreButton.textContent = 'Ladataan ...';
+                    Promise.all([fetch('assets/old-posts-0-minimal.json'), fetch('assets/old-posts-1-minimal.json')])
+                        .then(responses => Promise.all(responses.map(response => response.json())))
+                        .then(responses => responses.flatMap(response => response?.posts ?? []))
+                        .then(posts => {
+                            oldPosts = posts;
+                            document.querySelector('#year-selector').style.display = 'block';
+                            loadMoreButton.textContent = 'Näytä lisää';
+                            loadMoreButton.removeAttribute('disabled');
+
+                            if (initialYear) {
+                                selectYear(initialYear)
+                            } else {
+                                renderNextPage();
+                            }
+                        });
+                }
+
+                function selectYear(year) {
+                    if (!year) {
+                        return
+                    }
+
+                    document.querySelector('#year-selector .selected').classList.remove('selected');
+                    document.querySelector(`#year-selector a[href="#${year}"]`).classList.add('selected');
+                    document.querySelector('#wp-posts').replaceChildren();
+                    offset = oldPosts.findIndex(post => (new Date(post.date)).getFullYear() === year);
+                    renderNextPage();
+                }
 
                 function renderPost(post, oldPost = false) {
                     if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
