@@ -14,6 +14,7 @@ function extractFields(post) {
             .replace(/href=["']https?:\/\/clubinfektio\.com[^"']*["']/ig, '')
             .replace(/href=["']https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*["']/ig, '')
             .replace(/href=["']https?:\/\/infektio\.wordpress\.com[^"']*["']/ig, '')
+            .replace(/<img/ig, '<img loading="lazy"')
     }
 }
 
