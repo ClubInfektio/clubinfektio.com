@@ -12,9 +12,9 @@ function extractFields(post) {
             .replace(/<div[^<>]*style="float:left;width:100%;height:\d*px;overflow:hidden;"[^<>]*>/ig, '<div class="deleted">')
             .replace(/style="[^"]*"/ig, '')
             .replace(/href=["']https?:\/\/clubinfektio\.com[^"']*["']/ig, '')
-            .replace(/href=["']https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*["']/ig, '')
-            .replace(/href=["']https?:\/\/infektio\.wordpress\.com[^"']*["']/ig, '')
+            .replace(/href=["'](https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*)["']/ig, 'data-url="$1"')
             .replace(/<img/ig, '<img loading="lazy"')
+            .replace(/src="([^"]+\.(jpe?g|png|webp))"/ig, 'src="$1?w=1600&h=1200"')
     }
 }
 
