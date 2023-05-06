@@ -107,7 +107,7 @@
             text-align: center;
             color: white;
             font-weight: bold;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") no-repeat 50% 100%;
+            background: url(./assets/images/chevron-down.svg) no-repeat 50% 100%;
             transition: transform 0.15s;
         }
         @media (hover: hover) {
@@ -188,6 +188,42 @@
             max-width: 100%;
             max-height: 100vh;
         }
+        #previous, #next {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10%;
+            min-width: 60px;
+            z-index: 1;
+            cursor: pointer;
+        }
+        #modal:not(.closed) #previous::before, #modal:not(.closed) #next::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            top: calc(50% - 25px);
+            left: 10px;
+            background: url(./assets/images/chevron-down.svg) no-repeat 50% 50% / contain;
+            transform: rotate(90deg);
+            transition: opacity 0.2s;
+            animation: 1s ease-in-out 3s fade-out forwards;
+        }
+        #modal:not(.closed) #previous:active::before, #modal:not(.closed) #next:active::before {
+            opacity: 1!important;
+        }
+        @media (hover: hover) {
+            #modal:not(.closed) #previous:hover::before, #modal:not(.closed) #next:hover::before {
+                opacity: 1!important;
+            }
+        }
+        #modal:not(.closed) #next::before {
+            transform: rotate(270deg);
+            left: unset;
+            right: 10px;
+        }
+        #previous { left: 0; }
+        #next { right: 0; }
         .wp-block-gallery, .old-gallery{
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -217,6 +253,10 @@
             to {
                 transform: translateY(6px);
             }
+        }
+        @keyframes fade-out {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
     </style>
     <link rel="icon" type="image/png" href="./favicon.png">
@@ -261,9 +301,9 @@
             </section>
             <section id="modal" class="closed">
                 <div id="loader"></div>
-                <div id="modal-content">
-
-                </div>
+                <div id="modal-content"></div>
+                <div id="previous"></div>
+                <div id="next"></div>
             </section>
         </main>
 
@@ -312,6 +352,17 @@
                 modal.addEventListener('click', () => {
                     closeModal();
                 })
+
+                document.querySelector('#previous').addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    previousImage();
+                });
+                document.querySelector('#next').addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    nextImage();
+                });
 
                 document.addEventListener('keydown', event => {
                     if (event.key === 'Escape') {
