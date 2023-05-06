@@ -2,6 +2,8 @@ import fs from 'fs'
 import posts0 from './old-posts-0.json' assert { type: "json" }
 import posts1 from './old-posts-1.json' assert { type: "json" }
 
+const excludePosts = [4517]
+
 function extractFields(post) {
     return {
         ID: post.ID,
@@ -12,7 +14,10 @@ function extractFields(post) {
             .replace(/<div[^<>]*style="float:left;width:100%;height:\d*px;overflow:hidden;"[^<>]*>/ig, '<div class="deleted">')
             .replace(/style="[^"]*"/ig, '')
             .replace(/href=["']https?:\/\/clubinfektio\.com[^"']*["']/ig, '')
-            .replace(/href=["'](https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*)["']/ig, 'data-url="$1"')
+            .replace(/href=["'](https?:\/\/infektio\.(files\.)?wordpress\.com[^"']*)["']/ig, '')
+            .replace(/http:\/\/clubinfektio\.com/ig, 'https://clubinfektio.com')
+            .replace(/http:\/\/infektio\.files\.wordpress\.com/ig, 'https://infektio.files.wordpress.com')
+            .replace(/http:\/\/infektio\.wordpress\.com/ig, 'https://infektio.wordpress.com')
             .replace(/<img/ig, '<img loading="lazy"')
             .replace(/src="([^"]+\.(jpe?g|png|webp))"/ig, 'src="$1?w=1600&h=1200"')
     }
@@ -20,7 +25,9 @@ function extractFields(post) {
 
 function minifyPosts(postData) {
     return {
-        posts: postData.posts.map(extractFields)
+        posts: postData.posts
+            .filter(post => !excludePosts.includes(post.ID))
+            .map(extractFields)
     }
 }
 
