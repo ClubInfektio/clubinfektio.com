@@ -325,11 +325,12 @@
 
                 fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?number=1')
                     .then(response => response.json())
-                    .then(response => renderPost({ ...response?.posts?.[0], title: null }));
+                    .then(response => renderPost({ ...response?.posts?.[0], title: null }, false, true));
 
-                const yearCandidate = parseInt(window.location.hash.replace('#', ''))
-                const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null
-                if (initialYear) {
+                const urlHash = window.location.hash.replace('#', '');
+                const yearCandidate = parseInt(urlHash);
+                const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null;
+                if (urlHash) {
                     loadOldPosts();
                 }
 
@@ -393,8 +394,13 @@
                             document.querySelector('#year-selector').style.display = 'block';
                             loadMoreButton.textContent = 'Näytä lisää';
                             loadMoreButton.removeAttribute('disabled');
+                            const selectedPost = !initialYear && urlHash ? oldPosts.findIndex(post => post.slug.includes(urlHash)) : -1;
 
-                            if (initialYear) {
+                            if (selectedPost >= 0) {
+                                document.querySelector('#year-selector .selected').classList.remove('selected');
+                                offset = selectedPost;
+                                renderNextPage(1);
+                            } else if (initialYear) {
                                 selectYear(initialYear);
                             } else {
                                 renderNextPage();
@@ -407,7 +413,7 @@
                         return;
                     }
 
-                    document.querySelector('#year-selector .selected').classList.remove('selected');
+                    document.querySelector('#year-selector .selected')?.classList?.remove('selected');
                     document.querySelector(`#year-selector a[href="#${year}"]`).classList.add('selected');
                     document.querySelector('#wp-posts').replaceChildren();
                     offset = oldPosts.findIndex(post => (new Date(post.date)).getFullYear() === year);
@@ -436,7 +442,7 @@
                     });
                 }
 
-                function renderPost(post, oldPost = false) {
+                function renderPost(post, oldPost = false, open = false) {
                     if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
                         return;
                     }
@@ -459,7 +465,7 @@
                     document.querySelector(oldPost ? '#wp-posts' : '#first-post')
                         .appendChild(cardElement)
                         .appendChild(postElement);
-                    if (!oldPost) {
+                    if (open) {
                         setTimeout(() => openCard(cardElement), 1);
                     }
 
@@ -521,9 +527,9 @@
                     changeImage(1)
                 }
 
-                function renderNextPage() {
-                    oldPosts.slice(offset, offset + pageSize).forEach(post => renderPost(post, true));
-                    offset += pageSize;
+                function renderNextPage(size = pageSize) {
+                    oldPosts.slice(offset, offset + size).forEach(post => renderPost(post, true, size === 1));
+                    offset += size;
                     document.querySelector('#old-posts-button').style.display = offset < oldPosts.length ? 'inline-block' : 'none';
                 }
             }
