@@ -7,6 +7,7 @@ const excludePosts = [4517]
 function extractFields(post) {
     return {
         ID: post.ID,
+        slug: post.slug,
         date: post.date,
         title: post.title,
         content: post.content

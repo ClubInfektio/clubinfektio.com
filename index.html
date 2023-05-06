@@ -33,6 +33,12 @@
         h2 {
             margin-bottom: 0;
         }
+        h2 a {
+            text-decoration: none;
+        }
+        h2 a:hover {
+            text-decoration: underline;
+        }
         #content {
             width: 100%;
             max-width: 700px;
@@ -410,10 +416,24 @@
 
                 function restoreSrc(element) {
                     if (element.src) {
-                        return;
+                        return element;
                     }
                     element.src = element.dataset.source;
                     element.srcset = element.dataset.sourceset ?? element.srcset;
+                    return element;
+                }
+
+                function addKeyboardControls(element) {
+                    if (!element) {
+                        return
+                    }
+                    element.tabIndex = 0;
+                    element.addEventListener('keydown', event => {
+                        if (['Enter', ' '].includes(event.key)) {
+                            event.preventDefault();
+                            element.click();
+                        }
+                    });
                 }
 
                 function renderPost(post, oldPost = false) {
@@ -423,12 +443,19 @@
                     const cardElement = document.createElement('div');
                     const postElement = document.createElement('div');
                     const date = new Date(post.date)
-                    const titleElement = post.title ? `<h2>${post.title}</h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
+                    const titleElement = post.title ? `<h2><a href="#${post.slug}">${post.title}</a></h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
                     const content = post.content.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"')
                     postElement.innerHTML = `${titleElement}${content}`;
                     postElement.className = 'post';
                     cardElement.className = 'card closed';
-                    cardElement.addEventListener('click', openCard.bind(null, cardElement))
+                    cardElement.addEventListener('click', openCard.bind(null, cardElement, post));
+                    cardElement.addEventListener('keydown', event => {
+                        if (['Enter', ' '].includes(event.key)) {
+                            event.preventDefault();
+                            openCard(cardElement, post);
+                        }
+                    });
+                    cardElement.tabIndex = 0;
                     document.querySelector(oldPost ? '#wp-posts' : '#first-post')
                         .appendChild(cardElement)
                         .appendChild(postElement);
@@ -445,12 +472,17 @@
                     }, 1);
                 }
 
-                function openCard(cardElement, event) {
+                function openCard(cardElement, post, event) {
+                    cardElement.tabIndex = -1;
                     if (cardElement.classList.contains('open') && event?.target?.nodeName === 'IMG' && event.target.src) {
                         openImage(event.target.src, cardElement);
                     }
 
-                    cardElement.querySelectorAll('img').forEach(restoreSrc);
+                    if (post && post.slug) {
+                        window.location.hash = post.slug;
+                    }
+
+                    [...cardElement.querySelectorAll('img')].map(restoreSrc).forEach(addKeyboardControls);
                     cardElement.classList.replace('closed', 'open');
                     cardElement.classList.replace('preview', 'open');
                 }
