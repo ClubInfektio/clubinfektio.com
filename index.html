@@ -327,10 +327,11 @@
                     .then(response => response.json())
                     .then(response => renderPost({ ...response?.posts?.[0], title: null }, false, true));
 
-                const urlHash = window.location.hash.replace('#', '');
-                const yearCandidate = parseInt(urlHash);
+                const pathSearchAndHash = `${location.pathname}${location.search}${location.hash}`;
+                const urlSlug = pathSearchAndHash?.split(/[\/#]/).filter(Boolean).slice(-1)[0];
+                const yearCandidate = parseInt(urlSlug);
                 const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null;
-                if (urlHash) {
+                if (urlSlug) {
                     loadOldPosts();
                 }
 
@@ -394,7 +395,7 @@
                             document.querySelector('#year-selector').style.display = 'block';
                             loadMoreButton.textContent = 'Näytä lisää';
                             loadMoreButton.removeAttribute('disabled');
-                            const selectedPost = !initialYear && urlHash ? oldPosts.findIndex(post => post.slug.includes(urlHash)) : -1;
+                            const selectedPost = !initialYear && urlSlug ? oldPosts.findIndex(post => post.slug.includes(urlSlug)) : -1;
 
                             if (selectedPost >= 0) {
                                 document.querySelector('#year-selector .selected').classList.remove('selected');
@@ -431,7 +432,7 @@
 
                 function addKeyboardControls(element) {
                     if (!element) {
-                        return
+                        return;
                     }
                     element.tabIndex = 0;
                     element.addEventListener('keydown', event => {
@@ -448,9 +449,9 @@
                     }
                     const cardElement = document.createElement('div');
                     const postElement = document.createElement('div');
-                    const date = new Date(post.date)
+                    const date = new Date(post.date);
                     const titleElement = post.title ? `<h2><a href="#${post.slug}">${post.title}</a></h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
-                    const content = post.content.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"')
+                    const content = post.content.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"');
                     postElement.innerHTML = `${titleElement}${content}`;
                     postElement.className = 'post';
                     cardElement.className = 'card closed';
@@ -494,7 +495,7 @@
                 }
 
                 function getModalUrl(source) {
-                    return `${source.replace('thumb-', '').replace(/\?.*$/, '')}?w=1600&h=1200`
+                    return `${source.replace('thumb-', '').replace(/\?.*$/, '')}?w=1600&h=1200`;
                 }
 
                 function openImage(src, cardElement) {
@@ -520,11 +521,11 @@
                 }
 
                 function previousImage() {
-                    changeImage(-1)
+                    changeImage(-1);
                 }
 
                 function nextImage() {
-                    changeImage(1)
+                    changeImage(1);
                 }
 
                 function renderNextPage(size = pageSize) {
