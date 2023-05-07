@@ -13,7 +13,7 @@
             font-family:Arial, Helvetica, sans-serif;
         }
         body {
-            background: #22005a url(assets/images/bg.webp) no-repeat 50% 50% / cover;
+            background: #22005a url(/assets/images/bg.webp) no-repeat 50% 50% / cover;
             background-attachment: fixed;
             padding: 10px;
         }
@@ -113,7 +113,7 @@
             text-align: center;
             color: white;
             font-weight: bold;
-            background: url(./assets/images/chevron-down.svg) no-repeat 50% 100%;
+            background: url(/assets/images/chevron-down.svg) no-repeat 50% 100%;
             transition: transform 0.15s;
         }
         @media (hover: hover) {
@@ -210,7 +210,7 @@
             height: 50px;
             top: calc(50% - 25px);
             left: 10px;
-            background: url(./assets/images/chevron-down.svg) no-repeat 50% 50% / contain;
+            background: url(/assets/images/chevron-down.svg) no-repeat 50% 50% / contain;
             transform: rotate(90deg);
             transition: opacity 0.2s;
             animation: 1s ease-in-out 3s fade-out forwards;
@@ -265,19 +265,22 @@
             to { opacity: 0; }
         }
     </style>
-    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
     </head>
     <body>
         <main>
             <section id="content">
                 <div class="card">
                     <picture id="logo">
-                        <source srcset="assets/images/logo.webp" type="image/webp">
-                        <source srcset="assets/images/logo.png" type="image/png"> 
-                        <img src="assets/images/logo.png" alt="Club INFEKTIO">
+                        <source srcset="/assets/images/logo.webp" type="image/webp">
+                        <source srcset="/assets/images/logo.png" type="image/png">
+                        <img src="/assets/images/logo.png" alt="Club INFEKTIO">
                     </picture>
                     <p>
-                        Club Infektio on helsinkiläinen synkkään konemusiikkiin keskittyvä klubi joka tarjoilee tanssilattian täydeltä industrialia, EBM:ia, futurepoppia ja dark electroa sekä kaikkea mahdollista ja mahdotonta niiden ympäriltä. Alan kovimpien kotimaisten DJ:en ohella lavallemme nousee säännöllisesti sekä uusia että harvoin esiintyviä artisteja edellä mainituista genreistä. Party like it's 2085!
+                        Club INFEKTIO on helsinkiläinen synkkään konemusiikkiin keskittyvä klubi joka tarjoilee tanssilattian täydeltä industrialia, EBM:ia, futurepoppia ja dark electroa sekä kaikkea mahdollista ja mahdotonta niiden ympäriltä. Alan kovimpien kotimaisten DJ:en ohella lavallemme nousee säännöllisesti sekä uusia että harvoin esiintyviä artisteja edellä mainituista genreistä. Party like it's 2085!
+                    </p>
+                    <p>
+                        Club INFEKTIO is a Helsinki-based movement that focuses on dark and heavy electronic music. Our dance floors are flled with industrial, EBM, futurepop and all the unimaginable combinations of noise that swarm from deep inside the cybernet. Expect a full-scale riot of audio-visual madness, instigated by artists, bands and DJs. Party like it's 2085!
                     </p>
                     <p class="text-center">
                         <a class="button" href="https://www.instagram.com/clubinfektio/" ref="noreferrer">Instagram</a>
@@ -330,6 +333,9 @@
                 const pathSearchAndHash = `${location.pathname}${location.search}${location.hash}`;
                 const urlSlug = pathSearchAndHash?.split(/[\/#]/).filter(Boolean).slice(-1)[0];
                 const yearCandidate = parseInt(urlSlug);
+                if (yearCandidate === 2085) {
+                    openImage('https://infektio.files.wordpress.com/2011/09/infektio_4_page2.jpg?w=1600&h=1200');
+                }
                 const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null;
                 if (urlSlug) {
                     loadOldPosts();
@@ -387,7 +393,7 @@
                 function loadOldPosts() {
                     loadMoreButton.setAttribute('disabled', true);
                     loadMoreButton.textContent = 'Ladataan ...';
-                    Promise.all([fetch('assets/old-posts-0-minimal.json'), fetch('assets/old-posts-1-minimal.json')])
+                    Promise.all([fetch('/assets/old-posts-0-minimal.json'), fetch('/assets/old-posts-1-minimal.json')])
                         .then(responses => Promise.all(responses.map(response => response.json())))
                         .then(responses => responses.flatMap(response => response?.posts ?? []))
                         .then(posts => {
