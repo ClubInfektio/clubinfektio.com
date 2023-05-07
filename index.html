@@ -322,6 +322,8 @@
                 let currentGallery = [];
                 let modalImageIndex = 0;
                 let offset = 0;
+                let urlSlug;
+                let initialYear;
                 const pageSize = 20;
                 const modal = document.querySelector('#modal');
                 const loadMoreButton = document.querySelector('#old-posts-button');
@@ -330,16 +332,9 @@
                     .then(response => response.json())
                     .then(response => renderPost({ ...response?.posts?.[0], title: null }, false, true));
 
-                const pathSearchAndHash = `${location.pathname}${location.search}${location.hash}`;
-                const urlSlug = pathSearchAndHash?.split(/[\/#]/).filter(Boolean).slice(-1)[0];
-                const yearCandidate = parseInt(urlSlug);
-                if (yearCandidate === 2085) {
-                    openImage('https://infektio.files.wordpress.com/2011/09/infektio_4_page2.jpg?w=1600&h=1200');
-                }
-                const initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null;
-                if (urlSlug) {
-                    loadOldPosts();
-                }
+                parseUrlAndOpenContent();
+
+                window.addEventListener('hashchange', parseUrlAndOpenContent);
 
                 document.querySelector('#old-posts-button').addEventListener('click', event => {
                     event.preventDefault();
@@ -390,6 +385,19 @@
                     }
                 });
 
+                function parseUrlAndOpenContent() {
+                    const pathSearchAndHash = `${location.pathname}${location.search}${location.hash}`;
+                    urlSlug = pathSearchAndHash?.split(/[\/#]/).filter(Boolean).slice(-1)[0];
+                    const yearCandidate = parseInt(urlSlug);
+                    if (yearCandidate === 2085) {
+                        openImage('https://infektio.files.wordpress.com/2011/09/infektio_4_page2.jpg?w=1600&h=1200');
+                    }
+                    initialYear = yearCandidate > 2010 && yearCandidate < new Date().getFullYear() ? yearCandidate : null;
+                    if (urlSlug) {
+                        loadOldPosts();
+                    }
+                }
+
                 function loadOldPosts() {
                     loadMoreButton.setAttribute('disabled', true);
                     loadMoreButton.textContent = 'Ladataan ...';
@@ -401,11 +409,17 @@
                             document.querySelector('#year-selector').style.display = 'block';
                             loadMoreButton.textContent = 'Näytä lisää';
                             loadMoreButton.removeAttribute('disabled');
-                            const selectedPost = !initialYear && urlSlug ? oldPosts.findIndex(post => post.slug.includes(urlSlug)) : -1;
+                            const selectedPostOrderNumber = !initialYear && urlSlug ? oldPosts.findIndex(post => post.slug.includes(urlSlug)) : -1;
 
-                            if (selectedPost >= 0) {
+                            if (selectedPostOrderNumber >= 0) {
+                                const selectedPost = oldPosts[selectedPostOrderNumber];
+                                const postElement = document.querySelector(`#post-${selectedPost.ID}`);
+                                if (postElement) {
+                                    return;
+                                }
                                 document.querySelector('#year-selector .selected').classList.remove('selected');
-                                offset = selectedPost;
+                                offset = selectedPostOrderNumber;
+                                document.querySelector('#wp-posts').replaceChildren();
                                 renderNextPage(1);
                             } else if (initialYear) {
                                 selectYear(initialYear);
@@ -460,6 +474,7 @@
                     const content = post.content.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"');
                     postElement.innerHTML = `${titleElement}${content}`;
                     postElement.className = 'post';
+                    postElement.id = `post-${post.ID}`;
                     cardElement.className = 'card closed';
                     cardElement.addEventListener('click', openCard.bind(null, cardElement, post));
                     cardElement.addEventListener('keydown', event => {
