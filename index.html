@@ -329,7 +329,7 @@
                 const loadMoreButton = document.querySelector('#old-posts-button');
 
                 //fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?number=1')
-                fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts/4517')
+                fetch('https://public-api.wordpress.com/rest/v1.1/sites/18814373/posts?include=4517')
                     .then(response => response.json())
                     .then(response => renderPost({ ...response?.posts?.[0], title: null }, false, true));
 
