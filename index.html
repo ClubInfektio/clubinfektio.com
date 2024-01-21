@@ -307,7 +307,7 @@
                 <div id="wp-posts" class="wp-posts"></div>
 
                 <p class="text-center">
-                    <a class="button dark-bg" href="#old" id="old-posts-button">Selaa vanhoja artikkeleita ja kuvia</a>
+                    <a class="button dark-bg" href="#old" id="old-posts-button">Selaa kuvia ja artikkeleita</a>
                 </p>
             </section>
             <section id="modal" class="closed">
@@ -494,7 +494,7 @@
                     document.querySelector(oldPost ? '#wp-posts' : '#first-post')
                         .appendChild(cardElement)
                         .appendChild(postElement);
-                    if (open) {
+                    if (open || post.open === true) {
                         setTimeout(() => openCard(cardElement), 1);
                     }
 
