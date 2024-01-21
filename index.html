@@ -477,13 +477,17 @@
                     postElement.className = 'post';
                     postElement.id = `post-${post.ID}`;
                     cardElement.className = 'card closed';
-                    cardElement.addEventListener('click', openCard.bind(null, cardElement, post));
-                    cardElement.addEventListener('keydown', event => {
-                        if (['Enter', ' '].includes(event.key)) {
-                            event.preventDefault();
-                            openCard(cardElement, post);
-                        }
-                    });
+
+                    if (oldPost) {
+                        cardElement.addEventListener('click', openCard.bind(null, cardElement, post));
+                        cardElement.addEventListener('keydown', event => {
+                            if (['Enter', ' '].includes(event.key)) {
+                                event.preventDefault();
+                                openCard(cardElement, post);
+                            }
+                        });
+                    }
+
                     cardElement.tabIndex = 0;
                     document.querySelector(oldPost ? '#wp-posts' : '#first-post')
                         .appendChild(cardElement)
