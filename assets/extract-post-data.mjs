@@ -3,6 +3,7 @@ import posts0 from './old-posts-0.json' assert { type: "json" }
 import posts1 from './old-posts-1.json' assert { type: "json" }
 
 const excludePosts = [4517]
+const firstPost = '{"ID":123456,"open":true,"slug":"photos-after-2019","date":"2019-12-31T14:56:01+03:00","title":"Kuvat vuoden 2019 jälkeen","content":"<p>Vuoden 2019 jälkeen järjestettyjen bileiden kuvat löydät <a href=\"https://www.facebook.com/infektio/photos_albums\" target=\"_blank\" rel=\"noreferrer\">Facebook kuvagallerioista</a> sekä <a href=\"https://samaelcreative.com/photo-archive/?_search_test=club+infektio\" target=\"_blank\" rel=\"noreferrer\">Samael Creativen sivuilta</a>.</p>\n"}'
 
 function extractFields(post) {
     return {
@@ -32,5 +33,6 @@ function minifyPosts(postData) {
     }
 }
 
+// TODO: add firstPost
 fs.writeFileSync('./old-posts-0-minimal.json', JSON.stringify(minifyPosts(posts0)), 'utf8')
 fs.writeFileSync('./old-posts-1-minimal.json', JSON.stringify(minifyPosts(posts1)), 'utf8')
