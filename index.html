@@ -64,6 +64,26 @@
         #old-posts-button {
             margin-bottom: 30px;
         }
+        .year {
+            text-align: center;
+            position: relative;
+            margin: 60px 0 30px;
+            text-shadow: black 0 0 5px;
+        }
+        .year::before, .year::after {
+            content: '';
+            width: 30%;
+            border-bottom: 2px solid white;
+            box-shadow: 0 0 5px black;
+            position: absolute;
+            top: 50%;
+        }
+        .year::before {
+            left: 10px;
+        }
+        .year::after {
+            right: 10px;
+        }
         .date {
             color: #aaa;
             margin-top: 3px;
@@ -466,6 +486,14 @@
                     });
                 }
 
+                function renderYear(post) {
+                    const titleElement = document.createElement('h2');
+                    const date = new Date(post.date);
+                    titleElement.textContent = date.getFullYear()
+                    titleElement.className = 'year'
+                    document.querySelector('#wp-posts').appendChild(titleElement);
+                }
+
                 function renderPost(post, oldPost = false, open = false) {
                     if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
                         return;
@@ -557,7 +585,14 @@
                 }
 
                 function renderNextPage(size = pageSize) {
-                    oldPosts.slice(offset, offset + size).forEach(post => renderPost(post, true, size === 1));
+                    let previousPost;
+                    oldPosts.slice(offset, offset + size).forEach(post => {
+                        if (previousPost?.date && post?.date && new Date(previousPost.date).getFullYear() !== new Date(post.date).getFullYear()) {
+                            renderYear(post);
+                        }
+                        renderPost(post, true, size === 1);
+                        previousPost = post;
+                    });
                     offset += size;
                     document.querySelector('#old-posts-button').style.display = offset < oldPosts.length ? 'inline-block' : 'none';
                 }
