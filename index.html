@@ -60,6 +60,13 @@
         }
         #year-selector {
             display: none;
+            flex-wrap: wrap;
+            gap: 8.7px;
+            margin: 30px 0 20px;
+        }
+        #year-selector .button {
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            margin: 0;
         }
         #old-posts-button {
             margin-bottom: 30px;
@@ -122,6 +129,8 @@
         .preview {
             cursor: pointer;
             position: relative;
+            max-height: 525px;
+            overflow: visible;
         }
         .preview::after {
             content: 'Lue lisää';
@@ -132,13 +141,17 @@
             width: 100%;
             text-align: center;
             color: white;
+            text-shadow: black 0 0 5px;
             font-weight: bold;
             background: url(/assets/images/chevron-down.svg) no-repeat 50% 100%;
             transition: transform 0.15s;
         }
         @media (hover: hover) {
             .preview:hover .post {
-                max-height: 520px;
+                max-height: 540px;
+            }
+            .preview:hover::after {
+                transform: scale(1.1);
             }
         }
         .preview .post {
@@ -150,6 +163,10 @@
         .text-center {
             text-align: center;
         }
+        .note {
+            font-size: 13px;
+        }
+
         .button {
             display: inline-block;
             margin: 10px 0;
@@ -177,6 +194,29 @@
             background: white;
             color: black;
             backdrop-filter: none;
+        }
+        @media (hover: hover) {
+            .button:hover {
+                background: rgba(128,128,128,0.5);
+            }
+            .button.dark-bg:hover {
+                background: rgba(50,50,50,0.6);
+            }
+            .button.selected:hover {
+                background: rgba(255,255,255,0.8);
+            }
+        }
+        .button:active {
+            background: rgba(0,0,0,0.2);
+            box-shadow: none;
+        }
+        .button.dark-bg:active {
+            background: rgba(0,0,0,0.75);
+            box-shadow: none;
+        }
+        .button.selected:active {
+            background: rgba(255,255,255,0.6);
+            box-shadow: none;
         }
         @media (min-width: 400px) {
             .button {
@@ -313,7 +353,10 @@
                 <div id="first-post" class="wp-posts"></div>
 
                 <div id="year-selector">
-                    <a class="button small dark-bg selected" href="#2019">2019</a>
+                    <a class="button small dark-bg selected" href="#2025">2025</a>
+                    <a class="button small dark-bg" href="#2024">2024</a>
+                    <a class="button small dark-bg" href="#2023">2023</a>
+                    <a class="button small dark-bg" href="#2019">2019</a>
                     <a class="button small dark-bg" href="#2018">2018</a>
                     <a class="button small dark-bg" href="#2017">2017</a>
                     <a class="button small dark-bg" href="#2016">2016</a>
@@ -424,12 +467,12 @@
                 function loadOldPosts() {
                     loadMoreButton.setAttribute('disabled', true);
                     loadMoreButton.textContent = 'Ladataan ...';
-                    Promise.all([fetch('/assets/old-posts-0-minimal.json'), fetch('/assets/old-posts-1-minimal.json')])
+                    Promise.all([fetch('/assets/new-posts-0.json'), fetch('/assets/old-posts-0-minimal.json'), fetch('/assets/old-posts-1-minimal.json')])
                         .then(responses => Promise.all(responses.map(response => response.json())))
                         .then(responses => responses.flatMap(response => response?.posts ?? []))
                         .then(posts => {
                             oldPosts = posts;
-                            document.querySelector('#year-selector').style.display = 'block';
+                            document.querySelector('#year-selector').style.display = 'flex';
                             loadMoreButton.textContent = 'Näytä lisää';
                             loadMoreButton.removeAttribute('disabled');
                             const selectedPostOrderNumber = !initialYear && urlSlug ? oldPosts.findIndex(post => post.slug.includes(urlSlug)) : -1;
@@ -494,6 +537,18 @@
                     document.querySelector('#wp-posts').appendChild(titleElement);
                 }
 
+                function renderNewGallery(post) {
+                    if (!post.galleryPath || !post.galleryPhotoCount) {
+                        return '';
+                    }
+                    const images = Array.from({ length: post.galleryPhotoCount }, (_, i) => {
+                        const photoNumber = i + 1;
+                        return `<figure><img loading="lazy" src="/assets/photos/${post.galleryPath}/thumb/${photoNumber < 10 ? '0' : ''}${photoNumber}.jpg" /></figure>`;
+                    });
+                    console.log('images', images)
+                    return `<div class="wp-block-gallery">${images.join('')}</div>`;
+                }
+
                 function renderPost(post, oldPost = false, open = false) {
                     if (!post || !post.content || post.content.toLowerCase().replace(/\s/ig, '').includes('<script')) {
                         return;
@@ -502,7 +557,8 @@
                     const postElement = document.createElement('div');
                     const date = new Date(post.date);
                     const titleElement = post.title ? `<h2><a href="#${post.slug}">${post.title}</a></h2><p class="date">${date.toLocaleDateString('fi-FI')}</p>` : '';
-                    const content = post.content.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"');
+                    const newGallery = renderNewGallery(post)
+                    const content = `${post.content}${newGallery}`.replace(/src(set)?="([^"]+\.(jpe?g|png|webp)[^"]*)"/ig, 'data-source$1="$2"');
                     postElement.innerHTML = `${titleElement}${content}`;
                     postElement.className = 'post';
                     postElement.id = `post-${post.ID}`;
@@ -551,7 +607,8 @@
                 }
 
                 function getModalUrl(source) {
-                    return `${source.replace('thumb-', '').replace(/\?.*$/, '')}?w=1600&h=1200`;
+                    const sizeParams = source.toLowerCase().startsWith('http') ? '?w=1600&h=1200' : ''
+                    return `${source.replace('thumb-', '').replace('/thumb/', '/').replace(/\?.*$/, '')}${sizeParams}`;
                 }
 
                 function openImage(src, cardElement) {

@@ -22,6 +22,45 @@ function extractFields(post) {
             .replace(/http:\/\/infektio\.wordpress\.com/ig, 'https://infektio.wordpress.com')
             .replace(/<img/ig, '<img loading="lazy"')
             .replace(/src="([^"]+\.(jpe?g|png|webp))"/ig, 'src="$1?w=1600&h=1200"')
+        /* TODO: search and replace the following:
+        (esim. fb:n automaattisesti tekemät rajaukset ovat ok)
+        (Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin)
+
+        (Automaattiset rajaukset, joita mm. FB tekee automaattisesti ovat ok)
+        (Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin)
+
+        (Automaattiset rajaukset, joita mm. FB tekee on ok)
+        (Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin)
+
+        (the automatic cropping done by eg. FB is ok)
+        (These photos may not be used for AI training or be uploaded to generative AI services)
+
+        vesileima säilytetään kuvassa.
+        vesileima säilytetään kuvassa. Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin.
+
+        watermark is not removed.
+        watermark is not removed. These photos may not be used for AI training or be uploaded to generative AI services
+
+        Kuvia saa käyttää sosiaalisissa medioissa
+        Kuvia, joissa esiinnyt, saa käyttää sosiaalisissa medioissa
+
+        Kuvia saa käyttää esimerkiksi
+        Kuvia, joissa esiinnyt, saa käyttää esimerkiksi
+
+        You may use these pictures in social media
+        You may use the photos you appear in on social media
+
+        You may use the pictures in social media
+        You may use the photos you appear in on social media
+
+        and the picture is not altered
+        and the photo is not altered
+
+        kunhan kuvan yhteyteen tulee maininta Infektiosta 🙂
+        kunhan kuvan yhteyteen tulee maininta Infektiosta 🙂 (Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin)
+
+        Remove \n characters
+        */
     }
 }
 
