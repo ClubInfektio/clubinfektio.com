@@ -1,13 +1,31 @@
 {
     "posts": [
         {
-            "content": "<p>Kuvia, joissa esiinnyt, saa käyttää sosiaalisissa medioissa, kunhan vesileima säilytetään kuvassa.</p><p>You may use the photos you appear in on social media as long as the watermark is not removed.</p>",
+            "content": "<p>Club Infektion vuoden 2023 kolmas tapahtuma On the Rocksissa. Live-esiintyjen jälkeen loppuillasta tanssilattian täyttivät EBM:n, rytminoisen, dark synthwaven, hard industrial technon ja dark electron sävelillä DJ:t NoiZu, Kitsuna, Oppressor, Antinomy sekä Bitter Glitter. Kuvat on ottanut Samael Creative. </p><p class=\"note\">Kuvia, joissa esiinnyt, saa käyttää sosiaalisissa medioissa, kunhan vesileima säilytetään kuvassa. Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin.</p><p class=\"note\">You may use the photos you appear in on social media as long as the watermark is not removed. These photos may not be used for AI training or be uploaded to generative AI services.</p>",
+            "galleryPath": "vol.48-Samael",
+            "galleryPhotoCount": 35,
+            "date": "2023-06-10T12:00:00+02:00",
+            "ID": 200003,
+            "slug": "club-infektio-vol-48-zone-tripper-cryo-miseria-ultima",
+            "title": "Club Infektio vol. 48 &#8211; Zone Tripper, Cryo, Miseria Ultima"
+        },
+        {
+            "content": "<p>Club Infektion kevään 2023 toisessa tapahtumassa esiintyi Protectorate, Sto Desyat, vierailevana DJ:nä aQi sekä clubin resident-DJ:t, emanon, NoiZu, Minzeru ja Oppressor. Tunnelmien taltioijana toimi jälleen Samael Creative.</p><p class=\"note\">Kuvia, joissa esiinnyt, saa käyttää sosiaalisissa medioissa, kunhan vesileima säilytetään kuvassa. Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin.</p><p class=\"note\">You may use the photos you appear in on social media as long as the watermark is not removed. These photos may not be used for AI training or be uploaded to generative AI services.</p>",
+            "galleryPath": "vol.47-Samael",
+            "galleryPhotoCount": 36,
+            "date": "2023-04-15T12:00:00+02:00",
+            "ID": 200001,
+            "slug": "club-infektio-vol-47-protectorate-sto-desyat",
+            "title": "Club Infektio vol. 47 &#8211; Protectorate, Sto Desyat"
+        },
+        {
+            "content": "<p>Club Infektio löysi uuden tukikohdan On The Rocksista ja ensimmäiset bileemme siellä tanssittiin 18.2.2023. Tunnelmat kuvien muotoon tallensi Samael Creative.</p><p class=\"note\">Kuvia, joissa esiinnyt, saa käyttää sosiaalisissa medioissa, kunhan vesileima säilytetään kuvassa. Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin.</p><p class=\"note\">You may use the photos you appear in on social media as long as the watermark is not removed. These photos may not be used for AI training or be uploaded to generative AI services.</p>",
             "galleryPath": "vol.46-Samael",
             "galleryPhotoCount": 28,
-            "date": "2023-02-25T12:00:00+02:00",
+            "date": "2023-02-18T12:00:00+02:00",
             "ID": 200000,
-            "slug": "kuvat-club-infektio-vol-46-on-the-rocks",
-            "title": "Kuvat: Club Infektio vol. 46 &#8211; On The Rocks"
+            "slug": "club-infektio-vol-46-on-the-rocks",
+            "title": "Club Infektio vol. 46 &#8211; On The Rocks"
         }
     ]
 }

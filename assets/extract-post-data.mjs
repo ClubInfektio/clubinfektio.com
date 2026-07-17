@@ -58,6 +58,8 @@ function extractFields(post) {
 
         kunhan kuvan yhteyteen tulee maininta Infektiosta 🙂
         kunhan kuvan yhteyteen tulee maininta Infektiosta 🙂 (Kuvia ei saa käyttää tekoälyn kouluttamiseen tai ladata generatiivisiin tekoälypalveluihin)
+
+        Remove \n characters
         */
     }
 }
