@@ -17,6 +17,25 @@
             background-attachment: fixed;
             padding: 10px;
         }
+
+        /* iOS does not support background-attachment: fixed */
+        @supports(-webkit-touch-callout: none) {
+            body {
+                background-attachment: scroll;
+                background-image: none;
+            }
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(transparent 90%, #22005a), url(/assets/images/bg.webp) no-repeat 50% 50% / cover;
+                z-index: -1;
+            }
+        }
+
         main {
             display: flex;
             justify-content: center;
@@ -253,7 +272,7 @@
         }
         #modal-content img {
             max-width: 100%;
-            max-height: 100vh;
+            max-height: 100dvh;
         }
         #previous, #next {
             position: absolute;
